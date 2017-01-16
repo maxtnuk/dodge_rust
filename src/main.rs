@@ -167,10 +167,10 @@ impl Object {
         let mut result = plane_vec - before_theta;
         // set theta range in 0.0~2.0
         loop {
-            if result <= 0.0 {
+            if result < 0.0 {
                 result += 2.0;
                 continue;
-            } else if result >= 2.0 {
+            } else if result > 2.0 {
                 result -= 2.0;
                 continue;
             } else {
