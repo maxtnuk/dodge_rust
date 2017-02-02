@@ -7,6 +7,4 @@ this game purpose is surviving for long time and if green one hits with bule one
 
 you can move green one with arrow keys  
 
-so have fun!!!!
-
-
+have fun!!!!
