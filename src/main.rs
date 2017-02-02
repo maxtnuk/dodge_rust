@@ -196,13 +196,13 @@ fn between(x: f64, y: f64, target: f64) -> bool {
     x <= target && target <= y
 }
 // MAXINUM number of other particles
-const MAXINUM: u32 = 100;
+const MAXINUM: u32 = 200;
 // time limit of channel
 const TIME_LIMIT: u64 = 2000;
 fn main() {
     let opengls = OpenGL::V4_5;
     // set piston window
-    let mut window: PistonWindow = WindowSettings::new("machine_dodge", [400, 400])
+    let mut window: PistonWindow = WindowSettings::new("machine_dodge", [800, 800])
         .opengl(opengls)
         .exit_on_esc(true)
         .build()
