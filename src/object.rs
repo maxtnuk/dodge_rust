@@ -75,7 +75,7 @@ impl Object {
     pub fn set_color(&mut self, color: Color) {
         self.color = color;
     }
-    fn inner_set_pos(&mut self, pos: (f64, f64)) {
+    pub fn inner_set_pos(&mut self, pos: (f64, f64)) {
         self.current_state = pos;
     }
     pub fn arrow_set(&mut self, theta: f64) {
@@ -92,15 +92,18 @@ impl Object {
         };
         self.arrow = Arrow::new(theta);
     }
-    pub fn update(&mut self, args: &UpdateArgs) {
-        let before_pos = self.current_state;
+    pub fn move_self(&mut self, time: f64) {
         match self.current_speed {
             Speed::Go { scala } => {
-                self.current_state.0 += scala * self.arrow.cos * args.dt;
-                self.current_state.1 += scala * self.arrow.sin * args.dt;
+                self.current_state.0 += scala * self.arrow.cos * time;
+                self.current_state.1 += scala * self.arrow.sin * time;
             }
             Speed::None => {}
         };
+    }
+    pub fn update(&mut self, args: &UpdateArgs) {
+        let before_pos = self.current_state;
+        self.move_self(args.dt);
         if !self.is_wall() {
             self.collide();
             self.inner_set_pos(before_pos);

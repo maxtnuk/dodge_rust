@@ -9,8 +9,9 @@ use std::sync::mpsc;
 use std::time::Duration;
 use rand::{thread_rng, Rng};
 use stopwatch::Stopwatch;
+use carboxyl::{Sink, Signal};
+
 use self::object::*;
-use carboxyl::Sink;
 
 pub mod object;
 // MAXINUM number of other particles
@@ -34,6 +35,7 @@ fn main() {
     let mut game_status = Control::During(-1);
     let time_limit = Duration::from_millis(TIME_LIMIT);
     let sink: Sink<f64> = Sink::new();
+    let mut stream_vec: Vec<Signal<bool>> = Vec::new();
     // create main object
     let mut machine = Object::new(20.0, 20.0);
     // create other objects
@@ -81,6 +83,17 @@ fn main() {
                                 }
                             };
                             obstacles.push(temp);
+                            stream_vec.push(sink.stream()
+                                .fold(false, |_, x| {
+                                    let obstacle = obstacles.last_mut().unwrap();
+                                    let before_pos = obstacle.current_state;
+                                    obstacle.move_self(x);
+                                    if !obstacle.is_wall() {
+                                        obstacle.collide();
+                                        obstacle.inner_set_pos(before_pos);
+                                    }
+                                    obstacle.is_hit(&machine)
+                                }));
                         }
                     }
                 }
@@ -128,14 +141,14 @@ fn main() {
         // if there is the update event then run this code
         if let Some(u) = e.update_args() {
             machine.update(&u);
-            for obstacle in obstacles.iter_mut() {
+            sink.send(u.dt);
+            for obs in stream_vec.iter() {
                 {
                     // compare withe main and obstacles
-                    if machine.is_hit(&obstacle) {
+                    if obs.sample() {
                         game_status = Control::End;
                     }
                 }
-                obstacle.update(&u);
             }
         }
     }
