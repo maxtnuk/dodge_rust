@@ -55,7 +55,6 @@ fn main() {
                         *count += 1;
                     } else if *count < MAXINUM as i32 {
                         let rng = thread_rng().gen_range(1, 4);
-                        *count += rng;
                         // spawn randome number of obstacles
                         for _ in 0..rng {
                             let tx = tx.clone();
@@ -85,15 +84,16 @@ fn main() {
                             obstacles.push(temp);
                             stream_vec.push(sink.stream()
                                 .fold(false, |_, x| {
-                                    let obstacle = obstacles.last_mut().unwrap();
-                                    let before_pos = obstacle.current_state;
-                                    obstacle.move_self(x);
-                                    if !obstacle.is_wall() {
-                                        obstacle.collide();
-                                        obstacle.inner_set_pos(before_pos);
+                                    let index = *count as usize;
+                                    let before_pos = obstacles[index].current_state;
+                                    obstacles[index].move_self(x);
+                                    if !obstacles[index].is_wall() {
+                                        obstacles[index].collide();
+                                        obstacles[index].inner_set_pos(before_pos);
                                     }
-                                    obstacle.is_hit(&machine)
+                                    obstacles[index].is_hit(&machine)
                                 }));
+                            *count += 1;
                         }
                     }
                 }
